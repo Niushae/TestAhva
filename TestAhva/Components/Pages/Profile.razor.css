@@ -1,0 +1,21 @@
+.card-body { padding: 1.5rem; }
+.rounded-circle { border-radius: 50%; }
+.nav-tabs .nav-link.active { border-bottom: 3px solid #0d6efd; color: #0d6efd; }
+.input-with-icon { position: relative; }
+.input-with-icon .icon-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: transparent; padding: 0.25rem; color: #0d6efd; cursor: pointer; }
+.input-with-icon .icon-btn svg { display: block; }
+@media (max-width: 767.98px) {
+  .card-body { padding: 1rem; }
+  .rounded-circle { width: 72px !important; height: 72px !important; font-size: 1.5rem !important; }
+}
+/* readonly input styling */
+.readonly-input {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* remove left border on edit button inside input-group */
+.input-group .btn-outline-secondary {
+    border-left: none;
+}

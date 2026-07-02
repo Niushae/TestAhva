@@ -1,0 +1,390 @@
+@page "/profile/{UserId:int}"
+@layout Layout.DashboardLayout
+@using TestAhva.Data
+@using TestAhva.Models
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject ApplicationDbContext DbContext
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage ProtectedSessionStore
+@implements IDisposable
+
+<div class="container py-4">
+    @if (showInactivityModal)
+    {
+        <!-- Simple Bootstrap modal rendered from Razor when inactivity is detected -->
+        <div class="modal fade show" tabindex="-1" style="display:block; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Session inactivity</h5>
+                        <button type="button" class="btn-close" aria-label="Close" @onclick="ExtendSession"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your session will expire in <strong>@warningCountdown</strong> seconds due to inactivity.</p>
+                        <p>Do you want to extend your session?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="SignOut">Sign out</button>
+                        <button class="btn btn-primary" @onclick="ExtendSession">Extend session</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+
+    @if (profile == null)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Cargando información del perfil...</p>
+        </div>
+    }
+    else
+    {
+        <div class="mb-4 small text-muted">Perfil de usuario</div>
+        <h2 class="mb-3">Perfil de usuario</h2>
+
+        <div class="card shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="col align-items-start">
+                    <div class="col-lg-3 col-md-4 mb-3 mb-md-0">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:96px;height:96px;font-size:2.25rem;">
+                            @((!string.IsNullOrEmpty(profile.FirstName) ? profile.FirstName[0].ToString() : ""))@((!string.IsNullOrEmpty(profile.FirstLastName) ? profile.FirstLastName[0].ToString() : ""))
+                        </div>
+                        <h5 class="mb-0">@profile.FirstName @profile.FirstLastName</h5>
+                        <div class="text-muted small">@profile.JobTitle</div>
+                        <div class="mt-2">
+                            @{ 
+                                var isActive = profile?.User?.IsActive;
+                                var badgeClass = isActive == true ? "bg-success" : "bg-secondary";
+                                var display = isActive.HasValue ? (isActive.Value ? "Active" : "Inactive") : "Unknown";
+                            }
+                            <span class="badge @badgeClass">@display</span>
+                        </div>
+                        <div class="text-muted small mt-3">@profile.Institution</div>
+                    </div>
+
+                    <div class="col-lg-9 col-md-8">
+                        <ul class="nav nav-tabs border-bottom mb-3" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link @(activeTab == "general" ? "active" : "")" @onclick='() => ChangeTab("general")'>Información básica</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link @(activeTab == "responsabilidades" ? "active" : "")" @onclick='() => ChangeTab("responsabilidades")'>Responsabilidades</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link @(activeTab == "historial" ? "active" : "")" @onclick='() => ChangeTab("historial")'>Historial de responsabilidades</button>
+                            </li>
+                        </ul>
+
+                        <div>
+                            <style>
+                                .readonly-field { background-color:#f8f9fa; }
+                                .editable-icon { cursor:pointer; color: #0d6efd; border: none; background: transparent; }
+                                .input-with-icon { display:flex; gap:6px; align-items:center; }
+                            </style>
+
+                            @if (activeTab == "general")
+                            {
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Nombres</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.FirstName" readonly />
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Primer Apellido</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.FirstLastName" readonly />
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Segundo Apellido</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.SecondLastName" readonly />
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Tipo de Contratación</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.ContractType" readonly />
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Fecha de contratación</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.HireDate?.ToString("dd / MM / yyyy")" readonly />
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Nacionalidad</label>
+                                        <input class="form-control form-control-sm readonly-field" value="@profile.Nationality" readonly />
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Correo electrónico principal</label>
+                                        <div class="input-with-icon">
+                                            <input class="form-control form-control-sm @(isEditingContact ? "" : "readonly-field")" @bind="profile.PrimaryEmail" readonly="@(!isEditingContact)" />
+                                            @if (!string.IsNullOrEmpty(profile.PrimaryEmail))
+                                            {
+                                                <button type="button" class="editable-icon" title="Edit contact" @onclick="ToggleEditContact">✏️</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Teléfono Móvil</label>
+                                        <div class="input-with-icon">
+                                            <input class="form-control form-control-sm @(isEditingContact ? "" : "readonly-field")" @bind="profile.MobilePhone" readonly="@(!isEditingContact)" />
+                                            @if (!string.IsNullOrEmpty(profile.MobilePhone))
+                                            {
+                                                <button type="button" class="editable-icon" title="Edit contact" @onclick="ToggleEditContact">✏️</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label small text-muted">Correo electrónico secundario</label>
+                                        <div class="input-with-icon">
+                                            <input class="form-control form-control-sm @(isEditingContact ? "" : "readonly-field")" @bind="profile.SecondaryEmail" readonly="@(!isEditingContact)" />
+                                            @if (!string.IsNullOrEmpty(profile.SecondaryEmail))
+                                            {
+                                                <button type="button" class="editable-icon" title="Edit contact" @onclick="ToggleEditContact">✏️</button>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mt-2">
+                                        @if (isEditingContact)
+                                        {
+                                            <button class="btn btn-sm btn-primary me-2" @onclick="SaveContactChanges">Guardar Cambios</button>
+                                            <button class="btn btn-sm btn-outline-secondary" @onclick="ToggleEditContact">Cancelar</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-outline-primary" @onclick="ToggleEditContact">Editar contactos</button>
+                                        }
+
+                                        @if (showSaveSuccess)
+                                        {
+                                            <div class="alert alert-success py-2 small mt-2" role="alert">
+                                                Información guardada correctamente.
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else if (activeTab == "contacto")
+                            {
+                                <div class="text-muted small">Contacto (use la pestaña Información básica para editar)</div>
+                            }
+                            else if (activeTab == "responsabilidades")
+                            {
+                                <div class="text-muted small">Responsabilidades (contenido de ejemplo)</div>
+                            }
+                            else if (activeTab == "historial")
+                            {
+                                <div class="text-muted small">Historial de responsabilidades (contenido de ejemplo)</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private IJSObjectReference? _module;
+    private bool showInactivityModal = false;
+    private int warningCountdown = 60;
+    private System.Timers.Timer? warningTimer;
+
+    [Parameter] public int UserId { get; set; }
+    private ProfileDetails? profile;
+    private string activeTab = "general";
+    private bool showSaveSuccess = false;
+    private DotNetObjectReference<TestAhva.Components.Pages.Profile>? objRef;
+    private bool isEditingContact = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        profile = await DbContext.ProfileDetails.FirstOrDefaultAsync(p => p.UserId == UserId);
+
+        if (profile == null)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private void ChangeTab(string tabName)
+    {
+        activeTab = tabName;
+        showSaveSuccess = false;
+    }
+
+    private async Task SaveContactChanges()
+    {
+        if (profile != null)
+        {
+            // Update editable contact fields
+            var entry = DbContext.Entry(profile);
+            entry.Property(p => p.PrimaryEmail).IsModified = true;
+            entry.Property(p => p.MobilePhone).IsModified = true;
+            entry.Property(p => p.SecondaryEmail).IsModified = true;
+            await DbContext.SaveChangesAsync();
+            showSaveSuccess = true;
+            isEditingContact = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleEditContact()
+    {
+        isEditingContact = !isEditingContact;
+        if (!isEditingContact)
+        {
+            // Optionally reload original values to discard changes
+            _ = ReloadProfileAsync();
+        }
+    }
+
+    private async Task ReloadProfileAsync()
+    {
+        if (profile == null)
+        {
+            profile = await DbContext.ProfileDetails.FirstOrDefaultAsync(p => p.UserId == UserId);
+            StateHasChanged();
+            return;
+        }
+
+        // If an instance with the same key is already tracked, reload that tracked instance instead of
+        // creating a new one (which causes the duplicate tracking InvalidOperationException).
+        var trackedEntry = DbContext.ChangeTracker.Entries<TestAhva.Models.ProfileDetails>()
+            .FirstOrDefault(e => e.Entity.Id == profile.Id);
+
+        if (trackedEntry != null)
+        {
+            await trackedEntry.ReloadAsync();
+            profile = trackedEntry.Entity;
+        }
+        else
+        {
+            // No tracked instance, load normally (will be tracked)
+            profile = await DbContext.ProfileDetails.FirstOrDefaultAsync(p => p.UserId == UserId);
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var sessionResult = await ProtectedSessionStore.GetAsync<int>("UserId");
+                if (!sessionResult.Success || sessionResult.Value != UserId)
+                {
+                    Navigation.NavigateTo("/login");
+                    return;
+                }
+            }
+            catch
+            {
+                // In case session state access fails (e.g. during disconnect), redirect to login
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            objRef = DotNetObjectReference.Create(this);
+
+            // Load the JS module and call its exported function. Use the existing sessionTimeout module.
+            // Import using absolute path so module is resolved from web root
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/sessionTimeout.js");
+            await _module.InvokeVoidAsync("initializeInactivityTimer", objRef, 10000); // 10 seconds inactivity for demo
+        }
+    }
+
+    public void Dispose()
+    {
+        // Stop any running warning timer
+        StopWarningTimer();
+
+        try
+        {
+            objRef?.Dispose();
+        }
+        finally
+        {
+            // Dispose the JS module if it was loaded. Fire-and-forget DisposeAsync is acceptable here.
+            if (_module != null)
+            {
+                _ = _module.DisposeAsync();
+            }
+        }
+    }
+
+    private void StartWarningTimer()
+    {
+        StopWarningTimer();
+        warningTimer = new System.Timers.Timer(1000);
+        warningTimer.Elapsed += async (s, e) =>
+        {
+            warningCountdown--;
+            if (warningCountdown <= 0)
+            {
+                StopWarningTimer();
+                await InvokeAsync(() => SignOut());
+            }
+            else
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+        warningTimer.AutoReset = true;
+        warningTimer.Start();
+    }
+
+    private void StopWarningTimer()
+    {
+        if (warningTimer != null)
+        {
+            try
+            {
+                warningTimer.Stop();
+                warningTimer.Dispose();
+            }
+            catch { }
+            warningTimer = null;
+        }
+    }
+
+    private async Task ExtendSession()
+    {
+        showInactivityModal = false;
+        StopWarningTimer();
+        if (_module != null && objRef != null)
+        {
+            // Re-initialize the inactivity timer to extend the session
+            await _module.InvokeVoidAsync("initializeInactivityTimer", objRef, 10000); // 10 seconds inactivity for demo
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SignOut()
+    {
+        showInactivityModal = false;
+        StopWarningTimer();
+        try
+        {
+            await ProtectedSessionStore.DeleteAsync("UserId");
+        }
+        catch { }
+        Navigation.NavigateTo("/login");
+    }
+
+    [JSInvokable]
+    public async Task ShowInactivityWarning()
+    {
+        showInactivityModal = true;
+        warningCountdown = 5; // 5 seconds countdown for demo
+        StartWarningTimer();
+        await InvokeAsync(StateHasChanged);
+    }
+}

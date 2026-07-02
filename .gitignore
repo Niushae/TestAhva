@@ -1,0 +1,51 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# Rider
+.idea/
+
+# ASP.NET temp files
+wwwroot/lib/
+
+# User-specific files
+*.db
+*.db-journal
+
+# Sensitive configs
+appsettings.Development.json
+secrets.json
+
+# Logs
+*.log
+
+# Visual Studio Code
+.vscode/
+
+# NuGet
+*.nupkg
+.packages/
+
+# JetBrains Rider
+.idea/
+
+# Coverage
+coverage/
+
+# Node
+node_modules/
+
+# Publish output
+publish/
+
+# Resharper
+_ReSharper*/
+*/_ReSharper*/
+
+# EF Migrations
+Migrations/

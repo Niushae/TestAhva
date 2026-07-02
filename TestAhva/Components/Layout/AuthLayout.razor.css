@@ -1,0 +1,122 @@
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-size: cover;
+    background-position: center 85%;
+    background-repeat: no-repeat;
+    background-color: #f5f6f8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.auth-header {
+    background-color: #cf142b;
+    color: white;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.header-help {
+    color: white;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: 400;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.header-help:hover {
+    opacity: 0.8;
+}
+
+.auth-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-content-wide {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-footer {
+    background-color: #e9ecef;
+    padding: 10px 40px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.peru-logo {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    line-height: 1.2;
+    color: #495057;
+}
+
+.flag-section {
+    background-color: #cf142b;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.flag-text {
+    font-family: "Arial Black", Gadget, sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.text-section {
+    padding: 0 12px;
+    border-left: 1px solid #ced4da;
+    font-size: 10px;
+}
+
+.text-section:first-of-type {
+    border-left: none;
+}
+
+.text-section strong {
+    color: #212529;
+    font-weight: 600;
+}

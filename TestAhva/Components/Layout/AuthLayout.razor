@@ -1,0 +1,36 @@
+@inherits LayoutComponentBase
+
+<div class="auth-container min-vh-100" style="background-image: url('/machu_picchu_bg.png');">
+    <!-- Header -->
+    <header class="auth-header">
+        <div class="header-container">
+            <a href="#" class="header-help">?</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="auth-main d-flex justify-content-center align-items-center">
+        <div class="auth-content">
+            @Body
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="auth-footer">
+        <div class="footer-container">
+            <div class="peru-logo">
+                <div class="flag-section">
+                    <span class="flag-text">PERÚ</span>
+                </div>
+                <div class="text-section">
+                    <strong>Presidencia</strong><br/>
+                    <span>del Consejo de Ministros</span>
+                </div>
+                <div class="text-section">
+                    <strong>Centro Nacional</strong><br/>
+                    <span>de Planeamiento Estratégico</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>

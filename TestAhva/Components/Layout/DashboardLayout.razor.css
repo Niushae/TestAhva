@@ -1,0 +1,233 @@
+/* ===== Dashboard Wrapper ===== */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===== Header ===== */
+.dashboard-header {
+    background-color: #cf142b;
+    color: white;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    flex-shrink: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.header-icon:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.user-role {
+    font-size: 10px;
+    opacity: 0.85;
+}
+
+.header-logout {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.header-logout:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== Body (Sidebar + Main) ===== */
+.dashboard-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ===== Sidebar ===== */
+.dashboard-sidebar {
+    width: 56px;
+    background-color: white;
+    border-right: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.2s ease;
+    z-index: 999;
+}
+
+.dashboard-sidebar.collapsed {
+    width: 56px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+}
+
+.sidebar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-icon:hover {
+    color: #cf142b;
+    background-color: #fef2f2;
+}
+
+.sidebar-icon.active {
+    color: #cf142b;
+    background-color: #fef2f2;
+    border-left-color: #cf142b;
+}
+
+/* ===== Main Content ===== */
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.dashboard-content {
+    flex: 1;
+    padding: 24px 32px;
+}
+
+/* ===== Footer ===== */
+.dashboard-footer {
+    background-color: #e9ecef;
+    padding: 10px 32px;
+    border-top: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.peru-logo {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    line-height: 1.2;
+    color: #495057;
+}
+
+.flag-section {
+    background-color: #cf142b;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.flag-text {
+    font-family: "Arial Black", Gadget, sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.text-section {
+    padding: 0 12px;
+    border-left: 1px solid #ced4da;
+    font-size: 10px;
+}
+
+.text-section:first-of-type {
+    border-left: none;
+}
+
+.text-section strong {
+    color: #212529;
+    font-weight: 600;
+}
